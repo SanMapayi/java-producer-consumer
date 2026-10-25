@@ -1,0 +1,20 @@
+name: Java concurrency checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  concurrency:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Compile
+        run: mkdir -p out && javac --release 17 -d out src/*.java test/*.java
+      - name: Check delivery, interruption, and shutdown
+        run: java -cp out ConcurrencyChecks
+      - name: Run demo
+        run: java -cp out Main
